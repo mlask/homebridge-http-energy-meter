@@ -1,0 +1,25 @@
+{
+  "name": "homebridge-http-energy-meter",
+  "version": "0.0.1",
+  "description": "Simple http(s) plugin for homebridge supporting energy meter readings",
+  "license": "MIT",
+  "keywords": [
+    "homebridge-plugin",
+    "http",
+    "energy meter"
+  ],
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  },
+  "author": {
+    "name": "@mlask"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mlask/homebridge-http-energy-meter.git"
+  },
+  "dependencies": {
+    "request": "^2.5.0"
+  }
+}
