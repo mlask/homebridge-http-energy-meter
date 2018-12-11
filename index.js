@@ -63,7 +63,7 @@ function HttpEnergyMeter (log, config) {
 	inherits(PowerMeterService, Service);
 	
 	// define service
-	this.service = new PowerMeterService(this.options['name']);
+	this.service = new PowerMeterService(this.name);
 	this.service.getCharacteristic(EvePowerConsumption).on('get', this.getPowerConsumption.bind(this));
 	this.service.addCharacteristic(EveTotalPowerConsumption).on('get', this.getTotalPowerConsumption.bind(this));
 	
