@@ -20,7 +20,7 @@ function HttpEnergyMeter (log, config) {
 	this.http_method = config["http_method"] || "GET";
 	this.manufacturer = config["manufacturer"] || "@mlask";
 	this.field_current = config["field_current"] || "current";
-	this.update_interval = Number(config["update_interval"] || 120000);
+	this.update_interval = Number(config["update_interval"] || 30000);
 	
 	// internal variables
 	this.waiting_response = false;
@@ -62,15 +62,14 @@ function HttpEnergyMeter (log, config) {
 	};
 	inherits(PowerMeterService, Service);
 	
+	// internals
+	this._EvePowerConsumption = EvePowerConsumption;
+	this._EveTotalPowerConsumption = EveTotalPowerConsumption;
+	
 	// define service
 	this.service = new PowerMeterService(this.name);
-	this.service.getCharacteristic(EvePowerConsumption).on('get', this.getPowerConsumption.bind(this));
-	this.service.addCharacteristic(EveTotalPowerConsumption).on('get', this.getTotalPowerConsumption.bind(this));
-	
-	// init autoupdate
-	if (this.update_interval > 0) {
-		this.timer = setInterval(this.updateState.bind(this), this.update_interval);
-	}
+	this.service.getCharacteristic(this._EvePowerConsumption).on('get', this.getPowerConsumption.bind(this));
+	this.service.addCharacteristic(this._EveTotalPowerConsumption).on('get', this.getTotalPowerConsumption.bind(this));
 }
 
 HttpEnergyMeter.prototype.updateState = function () {
@@ -123,8 +122,8 @@ HttpEnergyMeter.prototype.updateState = function () {
 	.then((value_current, value_total) => {
 		this.powerConsumption = value_current;
 		this.totalPowerConsumption = value_total;
-		this.service.getCharacteristic(EvePowerConsumption).setValue(this.powerConsumption, undefined, undefined);
-		this.service.getCharacteristic(EveTotalPowerConsumption).setValue(this.totalPowerConsumption, undefined, undefined);
+		this.service.getCharacteristic(this._EvePowerConsumption).setValue(this.powerConsumption, undefined, undefined);
+		this.service.getCharacteristic(this._EveTotalPowerConsumption).setValue(this.totalPowerConsumption, undefined, undefined);
 		return true;
 	}, (error) => {
 		return error;
@@ -140,5 +139,9 @@ HttpEnergyMeter.prototype.getTotalPowerConsumption = function (callback) {
 };
 
 HttpEnergyMeter.prototype.getServices = function () {
+	this.log("getServices: " + this.name);
+	if (this.update_interval > 0) {
+		this.timer = setInterval(this.updateState.bind(this), this.update_interval);
+	}
 	return [this.service];
 };
